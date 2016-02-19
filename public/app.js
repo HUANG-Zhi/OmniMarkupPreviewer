@@ -92,6 +92,29 @@ $(function() {
     })
   }
 
+  var renderRich = function(){
+    var needRender = false
+    $(".codehilite pre").each(function(){
+      var precode = $(this).text()
+      if(precode.match("^#sequence.*")){
+        $(this).parent().html(
+          '<div class="diagram">'+precode+'</div>'
+        )
+        needRender = true
+      }
+    })
+
+    if (needRender) {
+      $.getScript('/public/raphael-min.js',function(){
+        $.getScript('/public/underscore-min.js',function(){
+          $.getScript('/public/sequence-diagram-min.js',function(){
+            $(".diagram").sequenceDiagram({theme: 'simple'})
+          })
+        })
+      })
+    }
+  }
+
   var poll = function() {
     var content$ = $('#content')
     var request = {
@@ -160,6 +183,7 @@ $(function() {
       }).always(function() {
         if (!disconnected) {
           poll()
+          renderRich()
         } else {
           reviveBuffer()
         }
@@ -169,4 +193,5 @@ $(function() {
 
   // Start polling once page started
   poll()
+  renderRich()
 })
